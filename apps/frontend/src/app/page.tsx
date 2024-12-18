@@ -21,7 +21,8 @@ function NotesList() {
 
   // Redirect invalid page numbers
   useEffect(() => {
-    if (pageParam && (isNaN(Number(pageParam)) || Number(pageParam) < 1)) {
+    const totalPages = Math.ceil(data?.notes.total / 5) || 1;
+    if (pageParam && (isNaN(Number(pageParam)) || Number(pageParam) < 1 || Number(pageParam) > totalPages)) {
       router.push('/?page=1');
     }
   }, [pageParam, router]);
@@ -45,7 +46,7 @@ function NotesList() {
     <>
       <div className="w-full flex flex-col gap-4">
         {data?.notes.notes.map((note: Note) => (
-          <Link key={note.id} href={`/notes/${note.id}`} className="no-underline">
+          <Link key={note.id} href={`/notes/${note.id}?from_page=${currentPage}`} className="no-underline">
             <div className="p-6 border border-slate-200 rounded-lg bg-white hover:translate-y-[-2px] transition-all hover:shadow-md cursor-pointer">
               <h2 className="text-xl text-slate-700 m-0">{note.title || 'Untitled Note'}</h2>
               <div className="mt-2 text-sm text-slate-500">
