@@ -12,7 +12,11 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
-  transpilePackages: ['@apollo/client'],
+  transpilePackages: ['@apollo/client', '@mdxeditor/editor'],
+  webpack: (config) => {
+    config.experiments = { ...config.experiments, topLevelAwait: true };
+    return config;
+  },
 };
 
 const plugins = [
