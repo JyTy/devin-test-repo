@@ -23,8 +23,8 @@ export const GET_NOTE = gql`
 `;
 
 export const CREATE_NOTE = gql`
-  mutation CreateNote($title: String, $text: String!) {
-    createNote(title: $title, text: $text) {
+  mutation CreateNote($input: CreateNoteInput!) {
+    createNote(input: $input) {
       id
       title
       text
