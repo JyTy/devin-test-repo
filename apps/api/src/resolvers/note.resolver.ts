@@ -13,8 +13,8 @@ export class NoteResolver {
 
   @Mutation(() => Note)
   async createNote(
-    @Arg('title', () => String) title: string,
-    @Arg('text', () => String) text: string
+    @Arg('text', () => String) text: string,
+    @Arg('title', () => String, { nullable: true }) title?: string
   ): Promise<Note> {
     return prisma.note.create({ data: { title, text } });
   }

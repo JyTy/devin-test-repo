@@ -5,7 +5,7 @@
   "scripts": {},
   "private": true,
   "prisma": {
-    "seed": "NODE_PATH=. ts-node --project apps/api/tsconfig.app.json apps/api/prisma/seed.ts"
+    "seed": "ts-node --project apps/api/tsconfig.app.json apps/api/prisma/seed.ts"
   },
   "dependencies": {
     "axios": "^1.6.0",
