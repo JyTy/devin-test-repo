@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from 'type-graphql';
+import { Field, ID, ObjectType, Int } from 'type-graphql';
 
 @ObjectType()
 export class Note {
@@ -16,4 +16,13 @@ export class Note {
 
   @Field(() => Date)
   updated_datetime!: Date;
+}
+
+@ObjectType()
+export class PaginatedNotes {
+  @Field(() => [Note])
+  notes!: Note[];
+
+  @Field(() => Int)
+  total!: number;
 }

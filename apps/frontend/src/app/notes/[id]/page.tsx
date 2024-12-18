@@ -2,6 +2,8 @@
 
 import { useQuery } from '@apollo/client';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { GET_NOTE } from '../../../graphql/notes';
 import { ApolloWrapper } from '../../../components/ApolloWrapper';
 import ReactMarkdown from 'react-markdown';
@@ -37,10 +39,28 @@ function NoteDetail({ id }: { id: string }) {
 }
 
 export default function Page({ params }: { params: { id: string } }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromPage = searchParams.get('page') || window.history.state?.page || '1';
+
+  useEffect(() => {
+    if (!window.history.state?.page) {
+      window.history.replaceState({ page: fromPage }, '', '');
+    }
+  }, [fromPage]);
+
   return (
     <ApolloWrapper>
       <div className="max-w-3xl mx-auto p-8">
-        <Link href="/" className="inline-block mb-8 text-blue-500 hover:text-blue-600 transition-colors">
+        <Link
+          href="/"
+          onClick={(e) => {
+            e.preventDefault();
+            const page = window.history.state?.page || '1';
+            router.push(`/?page=${page}`);
+          }}
+          className="inline-block mb-8 text-blue-500 hover:text-blue-600 transition-colors"
+        >
           ← Back to Notes
         </Link>
         <NoteDetail id={params.id} />
