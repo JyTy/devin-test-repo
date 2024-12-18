@@ -1,12 +1,14 @@
 'use client';
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useMutation } from '@apollo/client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CREATE_NOTE } from '../../../graphql/notes';
 import { ApolloWrapper } from '../../../components/ApolloWrapper';
+import { ForwardRefEditor } from '../../../components/ForwardRefEditor';
+import '@mdxeditor/editor/style.css';
 
 interface NoteFormData {
   title?: string;
@@ -17,6 +19,7 @@ function CreateNoteForm() {
   const router = useRouter();
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting }
   } = useForm<NoteFormData>();
@@ -55,12 +58,17 @@ function CreateNoteForm() {
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label htmlFor="text" className="text-sm font-medium text-slate-700">Content (markdown supported)</label>
-          <textarea
-            id="text"
-            {...register('text', { required: 'Content is required' })}
-            className={`p-3 border rounded-md min-h-[200px] resize-y focus:outline-none focus:border-blue-500 ${errors.text ? 'border-red-400' : 'border-slate-200'}`}
-            placeholder="Enter note content (markdown supported)"
+          <label htmlFor="text" className="text-sm font-medium text-slate-700">Content</label>
+          <Controller
+            name="text"
+            control={control}
+            rules={{ required: 'Content is required' }}
+            render={({ field }) => (
+              <ForwardRefEditor
+                markdown={field.value || ''}
+                onChange={field.onChange}
+              />
+            )}
           />
           {errors.text && <span className="text-sm text-red-600">{errors.text.message}</span>}
         </div>
