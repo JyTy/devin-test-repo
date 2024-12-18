@@ -4,7 +4,8 @@ import { expressMiddleware } from '@apollo/server/express4';
 import { createSchema } from './schema/schema';
 import cors from 'cors';
 
-const host = process.env.HOST ?? 'localhost';
+// Allow all hosts in deployment
+const host = '0.0.0.0';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 const app = express();
@@ -17,7 +18,13 @@ const bootstrap = async () => {
 
   await server.start();
 
-  app.use(cors());
+  // Configure CORS to accept all origins in development/testing
+  app.use(cors({
+    origin: '*',
+    methods: ['POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }));
+
   app.use(express.json());
   app.use('/graphql', expressMiddleware(server));
 

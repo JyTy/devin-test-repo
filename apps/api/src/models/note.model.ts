@@ -6,6 +6,9 @@ export class Note {
   id!: number;
 
   @Field(() => String)
+  title!: string;
+
+  @Field(() => String)
   text!: string;
 
   @Field(() => Date)

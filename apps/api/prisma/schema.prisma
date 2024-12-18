@@ -9,6 +9,7 @@ datasource db {
 
 model Note {
   id              Int      @id @default(autoincrement())
+  title           String
   text            String
   created_datetime DateTime @default(now())
   updated_datetime DateTime @updatedAt
