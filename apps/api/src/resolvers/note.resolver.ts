@@ -9,7 +9,7 @@ export class NoteResolver {
   @Query(() => PaginatedNotes)
   async notes(
     @Arg('skip', () => Int, { defaultValue: 0 }) skip: number,
-    @Arg('take', () => Int, { defaultValue: 10 }) take: number
+    @Arg('take', () => Int, { defaultValue: 5 }) take: number
   ): Promise<PaginatedNotes> {
     const [notes, total] = await Promise.all([
       prisma.note.findMany({

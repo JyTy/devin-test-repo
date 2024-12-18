@@ -15,7 +15,7 @@ interface Note {
 function NotesList() {
   const [page, setPage] = useState(1);
   const { data, loading, error } = useQuery(GET_NOTES, {
-    variables: { skip: (page - 1) * 10, take: 10 }
+    variables: { skip: (page - 1) * 5, take: 5 }
   });
 
   if (error) {
@@ -27,7 +27,7 @@ function NotesList() {
     return <div className="text-center p-8 text-slate-600">Loading notes...</div>;
   }
 
-  const totalPages = Math.ceil(data?.notes.total / 10) || 1;
+  const totalPages = Math.ceil(data?.notes.total / 5) || 1;
 
   return (
     <>

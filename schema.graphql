@@ -28,5 +28,5 @@ type PaginatedNotes {
 type Query {
   health: String!
   note(id: ID!): Note
-  notes(skip: Int! = 0, take: Int! = 10): PaginatedNotes!
+  notes(skip: Int! = 0, take: Int! = 5): PaginatedNotes!
 }
