@@ -4,12 +4,7 @@ import { useQuery } from '@apollo/client';
 import Link from 'next/link';
 import { GET_NOTES } from '../graphql/notes';
 import styles from './page.module.css';
-import dynamic from 'next/dynamic';
-
-const ApolloWrapper = dynamic(
-  () => import('../components/ApolloWrapper'),
-  { ssr: false }
-);
+import { ApolloWrapper } from '../components/ApolloWrapper';
 
 interface Note {
   id: string;
@@ -17,12 +12,19 @@ interface Note {
   created_datetime: string;
 }
 
-export default function Index() {
-  const { data, loading } = useQuery(GET_NOTES);
+function NotesList() {
+  const { data, loading, error } = useQuery(GET_NOTES);
 
-  const content = loading ? (
-    <div className={styles.loading}>Loading notes...</div>
-  ) : (
+  if (error) {
+    console.error('GraphQL Error:', error);
+    return <div className={styles.error}>Error loading notes. Please try again later.</div>;
+  }
+
+  if (loading) {
+    return <div className={styles.loading}>Loading notes...</div>;
+  }
+
+  return (
     <>
       <div className={styles.noteList}>
         {data?.notes.map((note: Note) => (
@@ -41,10 +43,14 @@ export default function Index() {
       </Link>
     </>
   );
+}
 
+export default function Page() {
   return (
     <ApolloWrapper>
-      <div className={styles.container}>{content}</div>
+      <div className={styles.container}>
+        <NotesList />
+      </div>
     </ApolloWrapper>
   );
 }
