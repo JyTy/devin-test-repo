@@ -9,6 +9,12 @@ import {
   thematicBreakPlugin,
   markdownShortcutPlugin,
   MDXEditor,
+  toolbarPlugin,
+  UndoRedo,
+  BoldItalicUnderlineToggles,
+  BlockTypeSelect,
+  CreateLink,
+  InsertTable,
   type MDXEditorMethods,
   type MDXEditorProps
 } from '@mdxeditor/editor'
@@ -24,7 +30,18 @@ export default function InitializedMDXEditor({
         listsPlugin(),
         quotePlugin(),
         thematicBreakPlugin(),
-        markdownShortcutPlugin()
+        markdownShortcutPlugin(),
+        toolbarPlugin({
+          toolbarContents: () => (
+            <>
+              <UndoRedo />
+              <BoldItalicUnderlineToggles />
+              <BlockTypeSelect />
+              <CreateLink />
+              <InsertTable />
+            </>
+          )
+        })
       ]}
       {...props}
       ref={editorRef}
