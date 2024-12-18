@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -8,24 +9,32 @@ import { CREATE_NOTE } from '../../../graphql/notes';
 import styles from './page.module.css';
 import { ApolloWrapper } from '../../../components/ApolloWrapper';
 
+interface NoteFormData {
+  title?: string;
+  text: string;
+}
+
 function CreateNoteForm() {
   const router = useRouter();
-  const [title, setTitle] = useState('');
-  const [text, setText] = useState('');
-  const [createNote, { loading, error }] = useMutation(CREATE_NOTE, {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting }
+  } = useForm<NoteFormData>();
+
+  const [createNote, { error }] = useMutation(CREATE_NOTE, {
     onCompleted: () => {
       router.push('/');
     }
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: NoteFormData) => {
     try {
       await createNote({
         variables: {
           input: {
-            title: title || null,
-            text
+            title: data.title || null,
+            text: data.text
           }
         }
       });
@@ -37,14 +46,13 @@ function CreateNoteForm() {
   return (
     <div className={styles.formContainer}>
       {error && <div className={styles.error}>Error creating note. Please try again.</div>}
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
         <div className={styles.field}>
           <label htmlFor="title" className={styles.label}>Title (optional)</label>
           <input
             id="title"
             type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            {...register('title')}
             className={styles.input}
             placeholder="Enter note title"
           />
@@ -53,16 +61,15 @@ function CreateNoteForm() {
           <label htmlFor="text" className={styles.label}>Content (markdown supported)</label>
           <textarea
             id="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className={styles.textarea}
+            {...register('text', { required: 'Content is required' })}
+            className={`${styles.textarea} ${errors.text ? styles.error : ''}`}
             placeholder="Enter note content (markdown supported)"
-            required
             rows={10}
           />
+          {errors.text && <span className={styles.errorText}>{errors.text.message}</span>}
         </div>
-        <button type="submit" disabled={loading} className={styles.submitButton}>
-          {loading ? 'Creating...' : 'Create Note'}
+        <button type="submit" disabled={isSubmitting} className={styles.submitButton}>
+          {isSubmitting ? 'Creating...' : 'Create Note'}
         </button>
       </form>
     </div>
