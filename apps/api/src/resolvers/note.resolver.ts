@@ -8,7 +8,11 @@ const prisma = new PrismaClient();
 export class NoteResolver {
   @Query(() => [Note])
   async notes(): Promise<Note[]> {
-    return prisma.note.findMany();
+    return prisma.note.findMany({
+      orderBy: {
+        created_datetime: 'desc'
+      }
+    });
   }
 
   @Mutation(() => Note)
