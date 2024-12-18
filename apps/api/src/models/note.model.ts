@@ -5,8 +5,8 @@ export class Note {
   @Field(() => ID)
   id!: number;
 
-  @Field(() => String)
-  title!: string;
+  @Field(() => String, { nullable: true })
+  title!: string | null;
 
   @Field(() => String)
   text!: string;
