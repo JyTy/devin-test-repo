@@ -6,7 +6,6 @@ import {
   headingsPlugin,
   listsPlugin,
   quotePlugin,
-  thematicBreakPlugin,
   markdownShortcutPlugin,
   MDXEditor,
   toolbarPlugin,
@@ -15,6 +14,7 @@ import {
   BlockTypeSelect,
   CreateLink,
   InsertTable,
+  tablePlugin,
   type MDXEditorMethods,
   type MDXEditorProps
 } from '@mdxeditor/editor'
@@ -29,8 +29,8 @@ export default function InitializedMDXEditor({
         headingsPlugin(),
         listsPlugin(),
         quotePlugin(),
-        thematicBreakPlugin(),
         markdownShortcutPlugin(),
+        tablePlugin(),
         toolbarPlugin({
           toolbarContents: () => (
             <>
