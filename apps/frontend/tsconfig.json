@@ -25,7 +25,8 @@
     ],
     "types": [
       "jest",
-      "node"
+      "node",
+      "@apollo/client"
     ]
   },
   "include": [

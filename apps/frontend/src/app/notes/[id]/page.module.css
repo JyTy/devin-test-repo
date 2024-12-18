@@ -1,0 +1,70 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.backButton {
+  display: inline-block;
+  margin-bottom: 2rem;
+  color: #4299e1;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.2s ease-in-out;
+}
+
+.backButton:hover {
+  color: #3182ce;
+}
+
+.noteContent {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  margin: 0 0 1rem;
+  font-size: 2rem;
+  color: #2d3748;
+}
+
+.metadata {
+  color: #718096;
+  font-size: 0.875rem;
+  margin-bottom: 2rem;
+}
+
+.markdownContent {
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+.markdownContent h1,
+.markdownContent h2,
+.markdownContent h3 {
+  color: #2d3748;
+  margin: 1.5rem 0 1rem;
+}
+
+.markdownContent ul,
+.markdownContent ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdownContent p {
+  margin: 1rem 0;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: #4a5568;
+}
+
+.error {
+  color: #e53e3e;
+}
