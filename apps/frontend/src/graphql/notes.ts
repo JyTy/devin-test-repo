@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 export const GET_NOTES = gql`
   query GetNotes {
-    notes(orderBy: { created_datetime: "desc" }) {
+    notes {
       id
       title
       created_datetime
@@ -23,8 +23,8 @@ export const GET_NOTE = gql`
 `;
 
 export const CREATE_NOTE = gql`
-  mutation CreateNote($input: CreateNoteInput!) {
-    createNote(input: $input) {
+  mutation CreateNote($title: String, $text: String!) {
+    createNote(title: $title, text: $text) {
       id
       title
       text

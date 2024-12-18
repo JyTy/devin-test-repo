@@ -1,4 +1,4 @@
-import { Mutation, Query, Resolver, Arg } from 'type-graphql';
+import { Mutation, Query, Resolver, Arg, ID } from 'type-graphql';
 import { Note } from '../models/note.model';
 import { PrismaClient } from '@prisma/client';
 
@@ -12,6 +12,13 @@ export class NoteResolver {
       orderBy: {
         created_datetime: 'desc'
       }
+    });
+  }
+
+  @Query(() => Note, { nullable: true })
+  async note(@Arg('id', () => ID) id: string): Promise<Note | null> {
+    return prisma.note.findUnique({
+      where: { id: parseInt(id) }
     });
   }
 

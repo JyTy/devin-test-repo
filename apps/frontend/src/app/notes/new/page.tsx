@@ -32,10 +32,8 @@ function CreateNoteForm() {
     try {
       await createNote({
         variables: {
-          input: {
-            title: data.title || null,
-            text: data.text
-          }
+          title: data.title || null,
+          text: data.text
         }
       });
     } catch (err) {

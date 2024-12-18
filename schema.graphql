@@ -22,5 +22,6 @@ type Note {
 
 type Query {
   health: String!
+  note(id: ID!): Note
   notes: [Note!]!
 }
