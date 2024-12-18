@@ -20,8 +20,13 @@ type Note {
   updated_datetime: DateTimeISO!
 }
 
+type PaginatedNotes {
+  notes: [Note!]!
+  total: Int!
+}
+
 type Query {
   health: String!
   note(id: ID!): Note
-  notes: [Note!]!
+  notes(skip: Int! = 0, take: Int! = 10): PaginatedNotes!
 }

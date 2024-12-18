@@ -1,18 +1,25 @@
-import { Mutation, Query, Resolver, Arg, ID } from 'type-graphql';
-import { Note } from '../models/note.model';
+import { Mutation, Query, Resolver, Arg, ID, Int } from 'type-graphql';
+import { Note, PaginatedNotes } from '../models/note.model';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 @Resolver(() => Note)
 export class NoteResolver {
-  @Query(() => [Note])
-  async notes(): Promise<Note[]> {
-    return prisma.note.findMany({
-      orderBy: {
-        created_datetime: 'desc'
-      }
-    });
+  @Query(() => PaginatedNotes)
+  async notes(
+    @Arg('skip', () => Int, { defaultValue: 0 }) skip: number,
+    @Arg('take', () => Int, { defaultValue: 10 }) take: number
+  ): Promise<PaginatedNotes> {
+    const [notes, total] = await Promise.all([
+      prisma.note.findMany({
+        orderBy: { created_datetime: 'desc' },
+        skip,
+        take,
+      }),
+      prisma.note.count(),
+    ]);
+    return { notes, total };
   }
 
   @Query(() => Note, { nullable: true })
