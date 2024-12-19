@@ -1,5 +1,8 @@
 import './global.css';
 import { Metadata } from 'next';
+import { AuthProvider } from '../contexts/auth';
+import { ApolloProvider } from '@apollo/client';
+import { client } from '../lib/apollo-client';
 
 export const metadata: Metadata = {
   title: 'Notes App',
@@ -13,7 +16,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          <ApolloProvider client={client}>
+            {children}
+          </ApolloProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }
