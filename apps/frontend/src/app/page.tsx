@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { GET_NOTES } from '../graphql/notes';
 import { ApolloWrapper } from '../components/ApolloWrapper';
+import { useAuth } from '../contexts/auth';
 
 interface Note {
   id: string;
@@ -14,6 +15,7 @@ interface Note {
 }
 
 function NotesList() {
+  const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const pageParam = searchParams.get('page');
@@ -62,6 +64,14 @@ function NotesList() {
 
   return (
     <>
+      {!user && (
+        <div className="w-full mb-8 p-4 bg-blue-50 rounded-lg text-center">
+          Please <Link href="/login" className="text-blue-500 hover:text-blue-600">login</Link>
+          {' '} or {' '}
+          <Link href="/register" className="text-blue-500 hover:text-blue-600">register</Link>
+          {' '} to view full note contents
+        </div>
+      )}
       <div className="w-full flex flex-col gap-4">
         {data?.notes.notes.map((note: Note) => (
           <Link
@@ -102,9 +112,11 @@ function NotesList() {
         </button>
       </div>
 
-      <Link href="/notes/new" className="mt-8 px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
-        Create New Note
-      </Link>
+      {user && (
+        <Link href="/notes/new" className="mt-8 px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+          Create New Note
+        </Link>
+      )}
     </>
   );
 }
