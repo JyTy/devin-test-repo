@@ -3,7 +3,7 @@
 import { useQuery } from '@apollo/client';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { GET_NOTES } from '../graphql/notes';
 import { ApolloWrapper } from '../components/ApolloWrapper';
 import { useAuth } from '../contexts/auth';
@@ -14,14 +14,13 @@ interface Note {
   created_datetime: string;
 }
 
-function NotesList() {
+function NotesContent() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const pageParam = searchParams.get('page');
   const currentPage = Number(pageParam) || 1;
 
-  // Handle browser history state
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
       const page = event.state?.page || 1;
@@ -33,7 +32,6 @@ function NotesList() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [currentPage, router]);
 
-  // Navigation function
   const navigateToPage = (page: number) => {
     window.history.pushState({ page }, '', page === 1 ? '/' : `/?page=${page}`);
     router.replace(`/?page=${page}`);
@@ -43,7 +41,6 @@ function NotesList() {
     variables: { skip: (currentPage - 1) * 5, take: 5 }
   });
 
-  // Redirect invalid page numbers
   useEffect(() => {
     const totalPages = Math.ceil(data?.notes.total / 5) || 1;
     if (pageParam && (isNaN(Number(pageParam)) || Number(pageParam) < 1 || Number(pageParam) > totalPages)) {
@@ -118,6 +115,14 @@ function NotesList() {
         </Link>
       )}
     </>
+  );
+}
+
+function NotesList() {
+  return (
+    <Suspense fallback={<div className="text-center p-8">Loading...</div>}>
+      <NotesContent />
+    </Suspense>
   );
 }
 

@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation } from '@apollo/client';
 import { VERIFY_EMAIL } from '../../graphql/auth';
 
-export default function VerifyPage() {
+function VerifyContent() {
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -39,5 +39,13 @@ export default function VerifyPage() {
         <div>Verifying your email...</div>
       )}
     </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense fallback={<div className="max-w-md mx-auto mt-8 p-4">Loading...</div>}>
+      <VerifyContent />
+    </Suspense>
   );
 }

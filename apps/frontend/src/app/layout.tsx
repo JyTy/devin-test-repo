@@ -1,6 +1,7 @@
 import './global.css';
 import { Metadata } from 'next';
-import Providers from './providers';
+import ClientProviders from '../components/ClientProviders';
+import Header from '../components/Header';
 
 export const metadata: Metadata = {
   title: 'Notes App',
@@ -15,9 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>
+        <ClientProviders>
+          <Header />
           {children}
-        </Providers>
+        </ClientProviders>
       </body>
     </html>
   );
