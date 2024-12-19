@@ -23,3 +23,12 @@ export const LOGIN = gql`
     }
   }
 `;
+
+export const VERIFY_EMAIL = gql`
+  mutation VerifyEmail($token: String!) {
+    verifyEmail(token: $token) {
+      success
+      message
+    }
+  }
+`;

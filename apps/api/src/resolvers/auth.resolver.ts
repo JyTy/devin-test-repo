@@ -3,6 +3,9 @@ import { PrismaClient } from '@prisma/client';
 import { User, AuthResponse } from '../models/user.model';
 import * as bcryptjs from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
+import * as crypto from 'crypto';
+import { sendVerificationEmail } from '../utils/email';
+import { VerifyEmailResponse } from './verify.resolver';
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
@@ -14,10 +17,28 @@ export class AuthResolver {
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string
   ): Promise<AuthResponse> {
-    const hashedPassword = await bcryptjs.hash(password, 10);
-    const user = await prisma.user.create({
-      data: { email, password: hashedPassword }
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
     });
+
+    if (existingUser) {
+      throw new Error('User already exists');
+    }
+
+    const verifyToken = crypto.randomBytes(32).toString('hex');
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: await bcryptjs.hash(password, 10),
+        verifyToken,
+        isVerified: false,
+        created_datetime: new Date()
+      },
+      include: { notes: true }
+    });
+
+    await sendVerificationEmail(email, verifyToken);
+
     const token = jwt.sign({ userId: user.id }, JWT_SECRET);
     return { token, user };
   }
@@ -27,7 +48,10 @@ export class AuthResolver {
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string
   ): Promise<AuthResponse> {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { notes: true }
+    });
     if (!user) throw new Error('Invalid credentials');
 
     const valid = await bcryptjs.compare(password, user.password);
@@ -37,21 +61,23 @@ export class AuthResolver {
     return { token, user };
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => VerifyEmailResponse)
   async verifyEmail(
     @Arg('token', () => String) token: string
-  ): Promise<boolean> {
+  ): Promise<VerifyEmailResponse> {
     const user = await prisma.user.findUnique({
       where: { verifyToken: token }
     });
 
-    if (!user) throw new Error('Invalid verification token');
+    if (!user) {
+      return { success: false, message: 'Invalid verification token' };
+    }
 
     await prisma.user.update({
       where: { id: user.id },
       data: { isVerified: true, verifyToken: null }
     });
 
-    return true;
+    return { success: true, message: 'Email verified successfully' };
   }
 }

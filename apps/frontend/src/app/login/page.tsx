@@ -5,6 +5,7 @@ import { useMutation } from '@apollo/client';
 import { LOGIN } from '../../graphql/auth';
 import { useAuth } from '../../contexts/auth';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -38,6 +39,9 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center">
       <div className="max-w-md w-full space-y-8 p-8">
         <h2 className="text-3xl font-bold text-center">Login</h2>
+        <p className="text-center">
+          Not a user yet? <Link href="/register" className="text-blue-500 hover:text-blue-600">Register here</Link>
+        </p>
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error}

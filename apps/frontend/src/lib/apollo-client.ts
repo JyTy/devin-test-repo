@@ -3,11 +3,11 @@
 import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink, ApolloLink } from '@apollo/client';
 
 const httpLink = new HttpLink({
-  uri: 'http://localhost:3000/graphql',
+  uri: 'https://user-auth-app-tunnel-lzcpvswi.devinapps.com/graphql',
 });
 
 const authLink = new ApolloLink((operation, forward) => {
-  const token = localStorage.getItem('token');
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   operation.setContext({
     headers: {
       authorization: token ? `Bearer ${token}` : '',

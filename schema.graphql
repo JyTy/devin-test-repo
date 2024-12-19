@@ -17,6 +17,7 @@ type Mutation {
   createNote(text: String!, title: String): Note!
   login(email: String!, password: String!): AuthResponse!
   register(email: String!, password: String!): AuthResponse!
+  verifyEmail(token: String!): VerifyEmailResponse!
 }
 
 type Note {
@@ -39,6 +40,15 @@ type Query {
 }
 
 type User {
+  created_datetime: DateTimeISO!
   email: String!
   id: ID!
+  isVerified: Boolean!
+  notes: [Note!]!
+  verifyToken: String
+}
+
+type VerifyEmailResponse {
+  message: String
+  success: Boolean!
 }

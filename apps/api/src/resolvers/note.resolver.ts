@@ -40,7 +40,9 @@ export class NoteResolver {
       where: { id: parseInt(id) }
     });
 
-    if (!ctx.user && note) {
+    if (!note) return null;
+
+    if (!ctx.user) {
       return {
         ...note,
         text: 'Please login to view the full note'
@@ -56,7 +58,9 @@ export class NoteResolver {
     @Ctx() ctx: Context,
     @Arg('title', () => String, { nullable: true }) title?: string
   ): Promise<Note> {
-    if (!ctx.user) throw new Error('Must be authenticated');
+    if (!ctx.user) throw new Error('Must be authenticated to create notes');
+    if (!ctx.user.isVerified) throw new Error('Please verify your email first');
+
     return prisma.note.create({
       data: {
         title,
