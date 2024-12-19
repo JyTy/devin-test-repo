@@ -37,6 +37,7 @@ type Query {
   health: String!
   note(id: ID!): Note
   notes(skip: Int! = 0, take: Int! = 5): PaginatedNotes!
+  verifyToken: User
 }
 
 type User {

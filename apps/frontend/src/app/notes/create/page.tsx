@@ -92,6 +92,20 @@ function CreateNoteForm() {
 }
 
 export default function Page() {
+  const { user, isVerified } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    if (!isVerified) {
+      alert('Please verify your email first');
+      router.push('/');
+    }
+  }, [user, isVerified, router]);
+
   return (
     <ApolloWrapper>
       <div className="max-w-3xl mx-auto p-8">

@@ -7,6 +7,7 @@ export const REGISTER = gql`
       user {
         id
         email
+        isVerified
       }
     }
   }
@@ -19,6 +20,7 @@ export const LOGIN = gql`
       user {
         id
         email
+        isVerified
       }
     }
   }
@@ -29,6 +31,16 @@ export const VERIFY_EMAIL = gql`
     verifyEmail(token: $token) {
       success
       message
+    }
+  }
+`;
+
+export const VERIFY_TOKEN = gql`
+  query VerifyToken {
+    verifyToken {
+      id
+      email
+      isVerified
     }
   }
 `;

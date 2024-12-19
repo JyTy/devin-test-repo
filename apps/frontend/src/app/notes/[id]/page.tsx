@@ -3,7 +3,7 @@
 import { useQuery } from '@apollo/client';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { GET_NOTE } from '../../../graphql/notes';
 import { ApolloWrapper } from '../../../components/ApolloWrapper';
 import ReactMarkdown from 'react-markdown';
@@ -59,13 +59,15 @@ function NoteDetail({ id }: { id: string }) {
 export default function Page({ params }: { params: { id: string } }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const fromPage = searchParams.get('page') || window.history.state?.page || '1';
+  const [fromPage, setFromPage] = useState('1');
 
   useEffect(() => {
+    const page = searchParams.get('page') || window.history.state?.page || '1';
+    setFromPage(page);
     if (!window.history.state?.page) {
-      window.history.replaceState({ page: fromPage }, '', '');
+      window.history.replaceState({ page }, '', '');
     }
-  }, [fromPage]);
+  }, [searchParams]);
 
   return (
     <ApolloWrapper>

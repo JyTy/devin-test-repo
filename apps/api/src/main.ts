@@ -26,25 +26,31 @@ const bootstrap = async () => {
 
   await server.start();
 
-  app.use(cors());
+  app.use(cors({
+    origin: ['http://localhost:4200'],
+    credentials: true
+  }));
   app.use(express.json());
 
   app.use('/graphql', expressMiddleware(server, {
     context: async ({ req }) => {
       const auth = req.headers.authorization || '';
-      if (auth) {
+      let token = null;
+      let user = null;
+
+      if (auth && auth.startsWith('Bearer ')) {
+        token = auth.split('Bearer ')[1];
         try {
-          const token = auth.split('Bearer ')[1];
           const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-          const user = await prisma.user.findUnique({
+          user = await prisma.user.findUnique({
             where: { id: decoded.userId }
           });
-          return { req, user };
         } catch (e) {
           console.error('Auth error:', e);
         }
       }
-      return { req, user: null };
+
+      return { req, user, token };
     },
   }));
 

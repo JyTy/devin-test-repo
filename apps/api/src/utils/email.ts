@@ -1,30 +1,33 @@
 import nodemailer from 'nodemailer';
 
-function validateEnvVars() {
-  const requiredVars = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM', 'FRONTEND_URL'] as const;
-  const missing = requiredVars.filter(varName => typeof process.env[varName] === 'undefined');
-
-  if (missing.length > 0) {
-    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
-  }
-}
-
 export async function sendVerificationEmail(email: string, token: string) {
-  validateEnvVars();
-
+  console.log('Setting up email transport...');
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST!,
-    port: parseInt(process.env.SMTP_PORT!),
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: false,
     auth: {
-      user: process.env.SMTP_USER!,
-      pass: process.env.SMTP_PASS!
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
     }
   });
+  console.log('Email transport configured');
 
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM!,
+  console.log('Sending verification email...');
+  const info = await transporter.sendMail({
+    from: `"Notes App" <${process.env.SMTP_USER}>`,
     to: email,
     subject: 'Verify your email',
-    html: `Click <a href="${process.env.FRONTEND_URL!}/verify?token=${token}">here</a> to verify your email`
+    html: `
+      <h1>Welcome to Notes App!</h1>
+      <p>Please click the link below to verify your email address:</p>
+      <a href="${process.env.FRONTEND_URL || 'http://localhost:4200'}/verify?token=${token}">Verify Email</a>
+    `
   });
+
+  console.log('Email sent successfully');
+  console.log('Message ID:', info.messageId);
+  console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
+
+  return info;
 }

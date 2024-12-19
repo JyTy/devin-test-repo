@@ -7,10 +7,10 @@ import { AuthProvider } from '../contexts/auth';
 
 export default function ClientProviders({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
-      <ApolloProvider client={client}>
+    <ApolloProvider client={client}>
+      <AuthProvider>
         {children}
-      </ApolloProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </ApolloProvider>
   );
 }

@@ -4,6 +4,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink, ApolloLink 
 
 const httpLink = new HttpLink({
   uri: 'http://localhost:3000/graphql',
+  credentials: 'include',
 });
 
 const authLink = new ApolloLink((operation, forward) => {
@@ -22,6 +23,9 @@ const client = new ApolloClient({
   defaultOptions: {
     watchQuery: {
       fetchPolicy: 'cache-and-network',
+    },
+    mutate: {
+      errorPolicy: 'all',
     },
   },
   connectToDevTools: true,

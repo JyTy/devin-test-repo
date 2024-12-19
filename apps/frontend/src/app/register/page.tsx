@@ -15,22 +15,46 @@ export default function RegisterPage() {
 
   const [registerMutation] = useMutation(REGISTER, {
     onCompleted: (data) => {
+      console.log('Registration completed:', data);
       login(data.register.token, data.register.user);
-      router.push('/');
+      router.push('/verify');
     },
     onError: (error) => {
-      setError(error.message);
+      console.error('Registration mutation error:', error);
+      console.error('GraphQL error details:', error.graphQLErrors);
+      console.error('Network error details:', error.networkError);
+      if (error.message.includes('535 Authentication failed')) {
+        setError('Account created but verification email could not be sent. Please contact support.');
+      } else {
+        setError(error.message);
+      }
     },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    console.log('Form submitted with:', { email, password });
+
     try {
-      await registerMutation({
+      console.log('Attempting registration mutation...');
+      const { data, errors } = await registerMutation({
         variables: { email, password },
       });
+
+      console.log('Registration response:', { data, errors });
+
+      if (errors) {
+        console.error('GraphQL errors:', errors);
+        setError(errors[0]?.message || 'Registration failed');
+        return;
+      }
     } catch (err) {
-      // Error is handled in onError callback
+      console.error('Registration error:', err);
+      if (err instanceof Error) {
+        setError(err.message);
+        console.error('Error details:', err.message, err.stack);
+      }
     }
   };
 

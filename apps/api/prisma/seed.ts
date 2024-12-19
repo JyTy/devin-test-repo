@@ -1,10 +1,21 @@
 import { PrismaClient } from '@prisma/client';
+import * as bcryptjs from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   // Clear existing data
   await prisma.note.deleteMany();
+  await prisma.user.deleteMany();
+
+  // Create test user
+  const testUser = await prisma.user.create({
+    data: {
+      email: 'test@example.com',
+      password: await bcryptjs.hash('testpassword123', 10),
+      isVerified: true,
+    },
+  });
 
   // Project Meeting Notes
   await prisma.note.create({
@@ -24,6 +35,9 @@ async function main() {
 
 ## Timeline
 Next sprint starts on Monday with dashboard implementation.`,
+      author: {
+        connect: { id: testUser.id }
+      }
     },
   });
 
@@ -47,6 +61,9 @@ Next sprint starts on Monday with dashboard implementation.`,
 * Whole grain pasta
 * Olive oil
 * Quinoa`,
+      author: {
+        connect: { id: testUser.id }
+      }
     },
   });
 
@@ -70,6 +87,9 @@ Next sprint starts on Monday with dashboard implementation.`,
    * Exercise 3x per week
    * Meditate daily
    * Maintain work-life balance`,
+      author: {
+        connect: { id: testUser.id }
+      }
     },
   });
 
