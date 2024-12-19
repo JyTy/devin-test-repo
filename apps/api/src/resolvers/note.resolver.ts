@@ -1,6 +1,7 @@
-import { Mutation, Query, Resolver, Arg, ID, Int } from 'type-graphql';
+import { Mutation, Query, Resolver, Arg, ID, Int, Ctx } from 'type-graphql';
 import { Note, PaginatedNotes } from '../models/note.model';
 import { PrismaClient } from '@prisma/client';
+import { Context } from '../types/context';
 
 const prisma = new PrismaClient();
 
@@ -9,31 +10,63 @@ export class NoteResolver {
   @Query(() => PaginatedNotes)
   async notes(
     @Arg('skip', () => Int, { defaultValue: 0 }) skip: number,
-    @Arg('take', () => Int, { defaultValue: 5 }) take: number
+    @Arg('take', () => Int, { defaultValue: 5 }) take: number,
+    @Ctx() ctx: Context
   ): Promise<PaginatedNotes> {
     const [notes, total] = await Promise.all([
       prisma.note.findMany({
         orderBy: { created_datetime: 'desc' },
         skip,
         take,
+        select: {
+          id: true,
+          title: true,
+          text: ctx.user ? true : false,
+          created_datetime: true,
+          updated_datetime: true,
+        }
       }),
       prisma.note.count(),
     ]);
-    return { notes, total };
+    return { notes: notes as Note[], total };
   }
 
   @Query(() => Note, { nullable: true })
-  async note(@Arg('id', () => ID) id: string): Promise<Note | null> {
-    return prisma.note.findUnique({
+  async note(
+    @Arg('id', () => ID) id: string,
+    @Ctx() ctx: Context
+  ): Promise<Note | null> {
+    const note = await prisma.note.findUnique({
       where: { id: parseInt(id) }
     });
+
+    if (!note) return null;
+
+    if (!ctx.user) {
+      return {
+        ...note,
+        text: 'Please login to view the full note'
+      };
+    }
+
+    return note;
   }
 
   @Mutation(() => Note)
   async createNote(
     @Arg('text', () => String) text: string,
+    @Ctx() ctx: Context,
     @Arg('title', () => String, { nullable: true }) title?: string
   ): Promise<Note> {
-    return prisma.note.create({ data: { title, text } });
+    if (!ctx.user) throw new Error('Must be authenticated to create notes');
+    if (!ctx.user.isVerified) throw new Error('Please verify your email first');
+
+    return prisma.note.create({
+      data: {
+        title,
+        text,
+        authorId: ctx.user.id
+      }
+    });
   }
 }

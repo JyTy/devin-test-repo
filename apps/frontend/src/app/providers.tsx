@@ -1,8 +1,17 @@
 'use client';
 
 import React from 'react';
-import { ApolloProvider, client } from '../lib/apollo-client';
+import { ApolloProvider } from '@apollo/client';
+import { client } from '../lib/apollo-client';
+import { AuthProvider } from '../contexts/auth';
 
+// This component is deprecated, use ClientProviders.tsx instead
 export default function Providers({ children }: { children: React.ReactNode }) {
-  return <ApolloProvider client={client}>{children}</ApolloProvider>;
+  return (
+    <AuthProvider>
+      <ApolloProvider client={client}>
+        {children}
+      </ApolloProvider>
+    </AuthProvider>
+  );
 }

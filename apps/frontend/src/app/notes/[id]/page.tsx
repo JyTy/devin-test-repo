@@ -3,15 +3,29 @@
 import { useQuery } from '@apollo/client';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { GET_NOTE } from '../../../graphql/notes';
 import { ApolloWrapper } from '../../../components/ApolloWrapper';
 import ReactMarkdown from 'react-markdown';
+import { useAuth } from '../../../contexts/auth';
 
 function NoteDetail({ id }: { id: string }) {
+  const { user, isVerified } = useAuth();
+  const router = useRouter();
   const { data, loading, error } = useQuery(GET_NOTE, {
     variables: { id }
   });
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    if (!isVerified) {
+      alert('Please verify your email first');
+      router.push('/');
+    }
+  }, [user, isVerified, router]);
 
   if (error) {
     console.error('GraphQL Error:', error);
@@ -20,6 +34,10 @@ function NoteDetail({ id }: { id: string }) {
 
   if (loading) {
     return <div className="text-center p-8 text-slate-600">Loading note...</div>;
+  }
+
+  if (!data?.note) {
+    return <div className="text-center p-8 text-slate-600">Note not found.</div>;
   }
 
   return (
@@ -41,13 +59,15 @@ function NoteDetail({ id }: { id: string }) {
 export default function Page({ params }: { params: { id: string } }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const fromPage = searchParams.get('page') || window.history.state?.page || '1';
+  const [fromPage, setFromPage] = useState('1');
 
   useEffect(() => {
+    const page = searchParams.get('page') || window.history.state?.page || '1';
+    setFromPage(page);
     if (!window.history.state?.page) {
-      window.history.replaceState({ page: fromPage }, '', '');
+      window.history.replaceState({ page }, '', '');
     }
-  }, [fromPage]);
+  }, [searchParams]);
 
   return (
     <ApolloWrapper>

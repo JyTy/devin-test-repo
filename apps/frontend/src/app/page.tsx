@@ -3,9 +3,10 @@
 import { useQuery } from '@apollo/client';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { GET_NOTES } from '../graphql/notes';
 import { ApolloWrapper } from '../components/ApolloWrapper';
+import { useAuth } from '../contexts/auth';
 
 interface Note {
   id: string;
@@ -13,13 +14,13 @@ interface Note {
   created_datetime: string;
 }
 
-function NotesList() {
+function NotesContent() {
+  const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const pageParam = searchParams.get('page');
   const currentPage = Number(pageParam) || 1;
 
-  // Handle browser history state
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
       const page = event.state?.page || 1;
@@ -31,7 +32,6 @@ function NotesList() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [currentPage, router]);
 
-  // Navigation function
   const navigateToPage = (page: number) => {
     window.history.pushState({ page }, '', page === 1 ? '/' : `/?page=${page}`);
     router.replace(`/?page=${page}`);
@@ -41,7 +41,6 @@ function NotesList() {
     variables: { skip: (currentPage - 1) * 5, take: 5 }
   });
 
-  // Redirect invalid page numbers
   useEffect(() => {
     const totalPages = Math.ceil(data?.notes.total / 5) || 1;
     if (pageParam && (isNaN(Number(pageParam)) || Number(pageParam) < 1 || Number(pageParam) > totalPages)) {
@@ -62,6 +61,14 @@ function NotesList() {
 
   return (
     <>
+      {!user && (
+        <div className="w-full mb-8 p-4 bg-blue-50 rounded-lg text-center">
+          Please <Link href="/login" className="text-blue-500 hover:text-blue-600">login</Link>
+          {' '} or {' '}
+          <Link href="/register" className="text-blue-500 hover:text-blue-600">register</Link>
+          {' '} to view full note contents
+        </div>
+      )}
       <div className="w-full flex flex-col gap-4">
         {data?.notes.notes.map((note: Note) => (
           <Link
@@ -102,10 +109,20 @@ function NotesList() {
         </button>
       </div>
 
-      <Link href="/notes/new" className="mt-8 px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
-        Create New Note
-      </Link>
+      {user && (
+        <Link href="/notes/new" className="mt-8 px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+          Create New Note
+        </Link>
+      )}
     </>
+  );
+}
+
+function NotesList() {
+  return (
+    <Suspense fallback={<div className="text-center p-8">Loading...</div>}>
+      <NotesContent />
+    </Suspense>
   );
 }
 
