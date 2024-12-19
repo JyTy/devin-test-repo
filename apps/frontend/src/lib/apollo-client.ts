@@ -3,7 +3,7 @@
 import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink, ApolloLink } from '@apollo/client';
 
 const httpLink = new HttpLink({
-  uri: 'https://user-auth-app-tunnel-lzcpvswi.devinapps.com/graphql',
+  uri: 'http://localhost:3000/graphql',
 });
 
 const authLink = new ApolloLink((operation, forward) => {
