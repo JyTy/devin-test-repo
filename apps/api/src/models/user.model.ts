@@ -7,6 +7,9 @@ export class User {
 
   @Field(() => String)
   email!: string;
+
+  // Password is not exposed in GraphQL schema
+  password!: string;
 }
 
 @ObjectType()

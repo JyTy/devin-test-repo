@@ -10,7 +10,8 @@ export class NoteResolver {
   @Query(() => PaginatedNotes)
   async notes(
     @Arg('skip', () => Int, { defaultValue: 0 }) skip: number,
-    @Arg('take', () => Int, { defaultValue: 5 }) take: number
+    @Arg('take', () => Int, { defaultValue: 5 }) take: number,
+    @Ctx() ctx: Context
   ): Promise<PaginatedNotes> {
     const [notes, total] = await Promise.all([
       prisma.note.findMany({
@@ -20,12 +21,14 @@ export class NoteResolver {
         select: {
           id: true,
           title: true,
-          created_datetime: true
+          text: ctx.user ? true : false,
+          created_datetime: true,
+          updated_datetime: true,
         }
       }),
       prisma.note.count(),
     ]);
-    return { notes, total };
+    return { notes: notes as Note[], total };
   }
 
   @Query(() => Note, { nullable: true })
