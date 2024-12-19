@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { AuthProvider } from '../contexts/auth';
 import { ApolloProvider } from '@apollo/client';
 import { client } from '../lib/apollo-client';
+import Header from '../components/Header';
 
 export const metadata: Metadata = {
   title: 'Notes App',
@@ -19,6 +20,7 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <ApolloProvider client={client}>
+            <Header />
             {children}
           </ApolloProvider>
         </AuthProvider>

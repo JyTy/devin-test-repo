@@ -36,4 +36,22 @@ export class AuthResolver {
     const token = jwt.sign({ userId: user.id }, JWT_SECRET);
     return { token, user };
   }
+
+  @Mutation(() => Boolean)
+  async verifyEmail(
+    @Arg('token', () => String) token: string
+  ): Promise<boolean> {
+    const user = await prisma.user.findUnique({
+      where: { verifyToken: token }
+    });
+
+    if (!user) throw new Error('Invalid verification token');
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { isVerified: true, verifyToken: null }
+    });
+
+    return true;
+  }
 }
